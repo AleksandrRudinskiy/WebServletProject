@@ -1,7 +1,5 @@
 package connection;
 
-import servlet.UserServlet;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;

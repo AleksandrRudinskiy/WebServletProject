@@ -8,9 +8,9 @@ public class GetRequestTest {
     @DisplayName("Тестирование запроса Get c проверкой status code = 200")
     public void getRequestCheckStatusCode() {
         RestAssured.given()
-                .baseUri("https://reqres.in/")//---> Cтартовая URL
+                .baseUri("http://localhost:8080/WebServletProject/")//---> Cтартовая URL
                 .relaxedHTTPSValidation()
-                .get("/api/users/2")//---> Endpoint для выполнения запроса GET
+                .get("/users/")//---> Endpoint для выполнения запроса GET
                 .then()
                 .statusCode(HttpStatus.SC_OK);//---> Проверка статус код
     }
