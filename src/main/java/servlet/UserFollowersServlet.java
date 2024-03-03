@@ -28,8 +28,5 @@ public class UserFollowersServlet extends HttpServlet {
             out.print(gson.toJson(userFollowers));
             out.flush();
         }
-
-
-
     }
 }
