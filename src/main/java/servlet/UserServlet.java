@@ -2,7 +2,9 @@ package servlet;
 
 import com.google.gson.Gson;
 import dao.UserDaoStorage;
+import exception.NotFoundException;
 import model.User;
+import storage.UserStorage;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -11,13 +13,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.logging.Logger;
 
 @WebServlet("/users")
 public class UserServlet extends HttpServlet {
     private final Gson gson = new Gson();
-    private final UserDaoStorage userDaoStorage = new UserDaoStorage();
+    private final UserStorage userStorage = new UserDaoStorage();
     private final Logger logger = Logger.getLogger(UserServlet.class.getName());
 
     @Override
@@ -26,27 +27,25 @@ public class UserServlet extends HttpServlet {
             logger.info("GET-запрос на получение пользователя по id");
             String id = request.getQueryString();
             try {
-                String userJsonString = gson.toJson(userDaoStorage.getUserById(id));
+                User user = userStorage.getUserById(id);
+                String userJsonString = gson.toJson(user);
                 PrintWriter out = response.getWriter();
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");
                 out.print(userJsonString);
                 out.flush();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
+            } catch (NotFoundException e) {
+                response.setStatus(400);
+                logger.info("Пользователь с id = " + id + "не найден.");
             }
         } else {
             logger.info("GET-запрос на получение списка всех пользователей");
-            try {
-                String usersJsonString = gson.toJson(userDaoStorage.getUsers());
-                PrintWriter out = response.getWriter();
-                response.setContentType("application/json");
-                response.setCharacterEncoding("UTF-8");
-                out.print(usersJsonString);
-                out.flush();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+            String usersJsonString = gson.toJson(userStorage.getUsers());
+            PrintWriter out = response.getWriter();
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            out.print(usersJsonString);
+            out.flush();
         }
     }
 
@@ -55,11 +54,7 @@ public class UserServlet extends HttpServlet {
         logger.info("POST-запрос на добавление пользователя");
         String jsonString = extractPostRequestBody(req);
         User user = gson.fromJson(jsonString, User.class);
-        try {
-            userDaoStorage.addUser(user);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        userStorage.addUser(user);
         logger.info("Добавлен новый пользователь с id = " + user.getId());
         PrintWriter out = resp.getWriter();
         out.print(gson.toJson(user));
@@ -71,11 +66,7 @@ public class UserServlet extends HttpServlet {
         logger.info("PUT-запрос на обновление пользователя");
         String jsonString = extractPostRequestBody(request);
         User user = gson.fromJson(jsonString, User.class);
-        try {
-            userDaoStorage.updateUser(user);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        userStorage.updateUser(user);
         logger.info("Обновлен пользователь с id = " + user.getId());
         PrintWriter out = response.getWriter();
         out.print(gson.toJson(user));
@@ -85,12 +76,13 @@ public class UserServlet extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) {
         logger.info("DELETE-запрос на удаление пользователя");
-        if (request.getQueryString()!= null) {
+        if (request.getQueryString() != null) {
             String id = request.getQueryString();
             try {
-                userDaoStorage.deleteUserById(id);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
+                userStorage.deleteUserById(id);
+            } catch (NotFoundException e) {
+                response.setStatus(400);
+                logger.info("Пользователь с id = " + id + "не найден.");
             }
         }
     }
