@@ -60,8 +60,18 @@ public class GetRequestUserTest {
     }
 
     @Test
+    @DisplayName("Тестирование запроса Get followers userId = \"to\" c проверкой status code = 200")
+    public void shouldReturn200WhenGetUserFollowersNotFound() {
+        RestAssured.given()
+                .baseUri(BASE_URL + "/followers/posts/user?to")
+                .relaxedHTTPSValidation()
+                .then()
+                .statusCode(HttpStatus.SC_BAD_REQUEST);
+    }
+
+    @Test
     @DisplayName("Тестирование запроса Get followers userId = \"tom\" c проверкой status code = 200")
-    public void shouldReturn200WhenGetUserFollowers() {
+    public void shouldReturn400WhenUserFollowers() {
         RestAssured.given()
                 .baseUri(BASE_URL + "/followers/posts/user?tom")
                 .relaxedHTTPSValidation()
