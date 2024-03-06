@@ -59,4 +59,14 @@ public class GetRequestUserTest {
                 .statusCode(HttpStatus.SC_BAD_REQUEST);
     }
 
+    @Test
+    @DisplayName("Тестирование запроса Get followers userId = \"tom\" c проверкой status code = 200")
+    public void shouldReturn200WhenGetUserFollowers() {
+        RestAssured.given()
+                .baseUri(BASE_URL + "/followers/posts/user?tom")
+                .relaxedHTTPSValidation()
+                .then()
+                .statusCode(HttpStatus.SC_OK);
+    }
+
 }

@@ -9,7 +9,6 @@ public class ConnectionAccess {
     private String user = "kitty";
     private String password = "purrrrrr";
     private String url = "jdbc:postgresql://localhost/cats";
-
     private final Logger logger = Logger.getLogger(ConnectionAccess.class.getName());
 
     public Connection makeConnection() {
